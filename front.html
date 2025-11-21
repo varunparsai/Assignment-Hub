@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assignment Writing Service</title>
+  <script src="/_sdk/data_sdk.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    .payment-option:has(input:checked) {
+      border-color: #2563eb !important;
+      background-color: #eff6ff !important;
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ </head>
+ <body class="min-h-full">
+  <div id="app"></div>
+  <script>
+    const defaultConfig = {
+      background_color: "#f8fafc",
+      primary_color: "#2563eb",
+      secondary_color: "#ffffff",
+      text_color: "#1e293b",
+      accent_color: "#10b981",
+      font_family: "Inter",
+      font_size: 16,
+      business_name: "Academic Writers",
+      tagline: "Your Academic Success Partner",
+      services_title: "Our Services",
+      contact_title: "Get Your Assignment Done",
+      submit_button_text: "Submit Request",
+      price_per_page: 50
+    };
+
+    let orders = [];
+
+    const dataHandler = {
+      onDataChanged(data) {
+        orders = data;
+        renderOrders();
+      }
+    };
+
+    async function initializeApp() {
+      const app = document.getElementById('app');
+      
+      app.innerHTML = `
+        <div style="background: ${defaultConfig.background_color}; min-height: 100%; font-family: ${defaultConfig.font_family}, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
+          <!-- Header -->
+          <header style="background: ${defaultConfig.primary_color}; color: white; padding: 2rem 1rem; text-align: center;">
+            <h1 id="business-name" style="font-size: ${defaultConfig.font_size * 2}px; font-weight: 700; margin: 0 0 0.5rem 0;">${defaultConfig.business_name}</h1>
+            <p id="tagline" style="font-size: ${defaultConfig.font_size * 1.125}px; margin: 0; opacity: 0.95;">${defaultConfig.tagline}</p>
+          </header>
+
+          <!-- Services Section -->
+          <section style="max-width: 1200px; margin: 0 auto; padding: 3rem 1rem;">
+            <h2 id="services-title" style="font-size: ${defaultConfig.font_size * 1.75}px; font-weight: 700; text-align: center; margin-bottom: 2rem; color: ${defaultConfig.text_color};">${defaultConfig.services_title}</h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+              <div style="background: ${defaultConfig.secondary_color}; padding: 1.5rem; border-radius: 0.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border: 2px solid ${defaultConfig.primary_color};">
+                <div style="font-size: 2rem; margin-bottom: 1rem;">📝</div>
+                <h3 style="font-size: ${defaultConfig.font_size * 1.25}px; font-weight: 600; margin-bottom: 0.5rem; color: ${defaultConfig.text_color};">Assignments</h3>
+                <p style="font-size: ${defaultConfig.font_size * 0.875}px; color: ${defaultConfig.text_color}; opacity: 0.8; margin: 0;">Complete assignment solutions with detailed explanations</p>
+              </div>
+
+              <div style="background: ${defaultConfig.secondary_color}; padding: 1.5rem; border-radius: 0.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border: 2px solid ${defaultConfig.primary_color};">
+                <div style="font-size: 2rem; margin-bottom: 1rem;">🔬</div>
+                <h3 style="font-size: ${defaultConfig.font_size * 1.25}px; font-weight: 600; margin-bottom: 0.5rem; color: ${defaultConfig.text_color};">Practical Files</h3>
+                <p style="font-size: ${defaultConfig.font_size * 0.875}px; color: ${defaultConfig.text_color}; opacity: 0.8; margin: 0;">Well-formatted practical files with observations</p>
+              </div>
+
+              <div style="background: ${defaultConfig.secondary_color}; padding: 1.5rem; border-radius: 0.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border: 2px solid ${defaultConfig.primary_color};">
+                <div style="font-size: 2rem; margin-bottom: 1rem;">📚</div>
+                <h3 style="font-size: ${defaultConfig.font_size * 1.25}px; font-weight: 600; margin-bottom: 0.5rem; color: ${defaultConfig.text_color};">Lab Manuals</h3>
+                <p style="font-size: ${defaultConfig.font_size * 0.875}px; color: ${defaultConfig.text_color}; opacity: 0.8; margin: 0;">Complete lab manuals with experiments and procedures</p>
+              </div>
+
+              <div style="background: ${defaultConfig.secondary_color}; padding: 1.5rem; border-radius: 0.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border: 2px solid ${defaultConfig.primary_color};">
+                <div style="font-size: 2rem; margin-bottom: 1rem;">📖</div>
+                <h3 style="font-size: ${defaultConfig.font_size * 1.25}px; font-weight: 600; margin-bottom: 0.5rem; color: ${defaultConfig.text_color};">Notes</h3>
+                <p style="font-size: ${defaultConfig.font_size * 0.875}px; color: ${defaultConfig.text_color}; opacity: 0.8; margin: 0;">Comprehensive study notes for exam preparation</p>
+              </div>
+            </div>
+
+            <!-- Order Form -->
+            <div style="background: ${defaultConfig.secondary_color}; padding: 2rem; border-radius: 0.75rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 600px; margin: 0 auto;">
+              <h2 id="contact-title" style="font-size: ${defaultConfig.font_size * 1.5}px; font-weight: 700; margin-bottom: 1.5rem; color: ${defaultConfig.text_color};">${defaultConfig.contact_title}</h2>
+              
+              <form id="order-form">
+                <div style="margin-bottom: 1rem;">
+                  <label for="name" style="display: block; font-size: ${defaultConfig.font_size * 0.875}px; font-weight: 500; margin-bottom: 0.25rem; color: ${defaultConfig.text_color};">Your Name *</label>
+                  <input type="text" id="name" required style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 0.5rem; font-size: ${defaultConfig.font_size}px; font-family: ${defaultConfig.font_family}, sans-serif;" placeholder="John Doe">
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                  <label for="email" style="display: block; font-size: ${defaultConfig.font_size * 0.875}px; font-weight: 500; margin-bottom: 0.25rem; color: ${defaultConfig.text_color};">Email Address *</label>
+                  <input type="email" id="email" required style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 0.5rem; font-size: ${defaultConfig.font_size}px; font-family: ${defaultConfig.font_family}, sans-serif;" placeholder="john@example.com">
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                  <label for="phone" style="display: block; font-size: ${defaultConfig.font_size * 0.875}px; font-weight: 500; margin-bottom: 0.25rem; color: ${defaultConfig.text_color};">Phone Number *</label>
+                  <input type="tel" id="phone" required style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 0.5rem; font-size: ${defaultConfig.font_size}px; font-family: ${defaultConfig.font_family}, sans-serif;" placeholder="+91 1234567890">
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                  <label for="service-type" style="display: block; font-size: ${defaultConfig.font_size * 0.875}px; font-weight: 500; margin-bottom: 0.25rem; color: ${defaultConfig.text_color};">Service Type *</label>
+                  <select id="service-type" required style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 0.5rem; font-size: ${defaultConfig.font_size}px; font-family: ${defaultConfig.font_family}, sans-serif;">
+                    <option value="">Select a service</option>
+                    <option value="assignment">Assignment</option>
+                    <option value="practical">Practical File</option>
+                    <option value="lab-manual">Lab Manual</option>
+                    <option value="notes">Notes</option>
+                  </select>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                  <label for="subject" style="display: block; font-size: ${defaultConfig.font_size * 0.875}px; font-weight: 500; margin-bottom: 0.25rem; color: ${defaultConfig.text_color};">Subject/Topic *</label>
+                  <input type="text" id="subject" required style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 0.5rem; font-size: ${defaultConfig.font_size}px; font-family: ${defaultConfig.font_family}, sans-serif;" placeholder="e.g., Data Structures">
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                  <label for="deadline" style="display: block; font-size: ${defaultConfig.font_size * 0.875}px; font-weight: 500; margin-bottom: 0.25rem; color: ${defaultConfig.text_color};">Deadline *</label>
+                  <input type="date" id="deadline" required style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 0.5rem; font-size: ${defaultConfig.font_size}px; font-family: ${defaultConfig.font_family}, sans-serif;">
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                  <label for="num-pages" style="display: block; font-size: ${defaultConfig.font_size * 0.875}px; font-weight: 500; margin-bottom: 0.25rem; color: ${defaultConfig.text_color};">Number of Pages *</label>
+                  <input type="number" id="num-pages" min="1" max="100" value="1" required style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 0.5rem; font-size: ${defaultConfig.font_size}px; font-family: ${defaultConfig.font_family}, sans-serif;">
+                  <p style="font-size: ${defaultConfig.font_size * 0.75}px; color: ${defaultConfig.text_color}; opacity: 0.6; margin: 0.25rem 0 0 0;">₹${defaultConfig.price_per_page} per page</p>
+                </div>
+
+                <div style="margin-bottom: 1.5rem; padding: 1rem; background: #f1f5f9; border-radius: 0.5rem; border: 2px solid ${defaultConfig.primary_color};">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: ${defaultConfig.font_size * 1.125}px; font-weight: 600; color: ${defaultConfig.text_color};">Total Amount:</span>
+                    <span id="total-amount" style="font-size: ${defaultConfig.font_size * 1.5}px; font-weight: 700; color: ${defaultConfig.primary_color};">₹${defaultConfig.price_per_page}</span>
+                  </div>
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                  <label for="details" style="display: block; font-size: ${defaultConfig.font_size * 0.875}px; font-weight: 500; margin-bottom: 0.25rem; color: ${defaultConfig.text_color};">Assignment Details/Questions *</label>
+                  <textarea id="details" required rows="5" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 0.5rem; font-size: ${defaultConfig.font_size}px; font-family: ${defaultConfig.font_family}, sans-serif; resize: vertical;" placeholder="Describe your requirements in detail..."></textarea>
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                  <label style="display: block; font-size: ${defaultConfig.font_size * 0.875}px; font-weight: 500; margin-bottom: 0.5rem; color: ${defaultConfig.text_color};">Payment Method *</label>
+                  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;">
+                    <label style="display: flex; align-items: center; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 0.5rem; cursor: pointer; transition: all 0.2s;" class="payment-option">
+                      <input type="radio" name="payment-method" value="upi" required style="margin-right: 0.5rem;">
+                      <span style="font-size: ${defaultConfig.font_size * 0.875}px;">💳 UPI</span>
+                    </label>
+                    <label style="display: flex; align-items: center; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 0.5rem; cursor: pointer; transition: all 0.2s;" class="payment-option">
+                      <input type="radio" name="payment-method" value="paytm" required style="margin-right: 0.5rem;">
+                      <span style="font-size: ${defaultConfig.font_size * 0.875}px;">📱 Paytm</span>
+                    </label>
+                    <label style="display: flex; align-items: center; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 0.5rem; cursor: pointer; transition: all 0.2s;" class="payment-option">
+                      <input type="radio" name="payment-method" value="gpay" required style="margin-right: 0.5rem;">
+                      <span style="font-size: ${defaultConfig.font_size * 0.875}px;">🔷 Google Pay</span>
+                    </label>
+                    <label style="display: flex; align-items: center; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 0.5rem; cursor: pointer; transition: all 0.2s;" class="payment-option">
+                      <input type="radio" name="payment-method" value="phonepe" required style="margin-right: 0.5rem;">
+                      <span style="font-size: ${defaultConfig.font_size * 0.875}px;">💜 PhonePe</span>
+                    </label>
+                    <label style="display: flex; align-items: center; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 0.5rem; cursor: pointer; transition: all 0.2s;" class="payment-option">
+                      <input type="radio" name="payment-method" value="card" required style="margin-right: 0.5rem;">
+                      <span style="font-size: ${defaultConfig.font_size * 0.875}px;">💳 Debit/Credit</span>
+                    </label>
+                    <label style="display: flex; align-items: center; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 0.5rem; cursor: pointer; transition: all 0.2s;" class="payment-option">
+                      <input type="radio" name="payment-method" value="cod" required style="margin-right: 0.5rem;">
+                      <span style="font-size: ${defaultConfig.font_size * 0.875}px;">💵 Cash</span>
+                    </label>
+                  </div>
+                  <p style="font-size: ${defaultConfig.font_size * 0.75}px; color: ${defaultConfig.text_color}; opacity: 0.6; margin: 0.5rem 0 0 0; text-align: center;">Note: Payment details will be shared after order confirmation</p>
+                </div>
+
+                <button type="submit" id="submit-btn" style="width: 100%; padding: 1rem; background: ${defaultConfig.primary_color}; color: white; font-size: ${defaultConfig.font_size * 1.125}px; font-weight: 600; border: none; border-radius: 0.5rem; cursor: pointer; transition: opacity 0.2s;">
+                  <span id="submit-text">${defaultConfig.submit_button_text}</span>
+                </button>
+
+                <div id="success-message" style="display: none; margin-top: 1rem; padding: 1rem; background: ${defaultConfig.accent_color}; color: white; border-radius: 0.5rem; text-align: center; font-size: ${defaultConfig.font_size * 0.875}px;">
+                  ✓ Your request has been submitted successfully! We'll contact you soon with payment details.
+                </div>
+
+                <div id="error-message" style="display: none; margin-top: 1rem; padding: 1rem; background: #ef4444; color: white; border-radius: 0.5rem; text-align: center; font-size: ${defaultConfig.font_size * 0.875}px;">
+                </div>
+              </form>
+            </div>
+
+            <!-- Orders List -->
+            <div style="margin-top: 3rem; max-width: 800px; margin-left: auto; margin-right: auto;">
+              <h2 style="font-size: ${defaultConfig.font_size * 1.5}px; font-weight: 700; margin-bottom: 1.5rem; color: ${defaultConfig.text_color};">Recent Requests</h2>
+              <div id="orders-list"></div>
+            </div>
+          </section>
+        </div>
+      `;
+
+      setupFormHandler();
+      setupPriceCalculator();
+      renderOrders();
+
+      if (window.dataSdk) {
+        const initResult = await window.dataSdk.init(dataHandler);
+        if (!initResult.isOk) {
+          console.error("Failed to initialize data SDK");
+        }
+      }
+
+      if (window.elementSdk) {
+        await window.elementSdk.init({
+          defaultConfig,
+          onConfigChange,
+          mapToCapabilities,
+          mapToEditPanelValues
+        });
+      }
+    }
+
+    function setupPriceCalculator() {
+      const numPagesInput = document.getElementById('num-pages');
+      const totalAmountDisplay = document.getElementById('total-amount');
+
+      function updatePrice() {
+        const pages = parseInt(numPagesInput.value) || 1;
+        const pricePerPage = window.elementSdk?.config?.price_per_page || defaultConfig.price_per_page;
+        const total = pages * pricePerPage;
+        totalAmountDisplay.textContent = `₹${total}`;
+      }
+
+      numPagesInput.addEventListener('input', updatePrice);
+    }
+
+    function setupFormHandler() {
+      const form = document.getElementById('order-form');
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        if (orders.length >= 999) {
+          const errorMsg = document.getElementById('error-message');
+          errorMsg.textContent = 'Maximum limit of 999 requests reached. Please contact us directly.';
+          errorMsg.style.display = 'block';
+          setTimeout(() => {
+            errorMsg.style.display = 'none';
+          }, 5000);
+          return;
+        }
+
+        const submitBtn = document.getElementById('submit-btn');
+        const submitText = document.getElementById('submit-text');
+        const successMsg = document.getElementById('success-message');
+        const errorMsg = document.getElementById('error-message');
+
+        submitBtn.disabled = true;
+        submitBtn.style.opacity = '0.6';
+        submitText.textContent = 'Submitting...';
+
+        const numPages = parseInt(document.getElementById('num-pages').value) || 1;
+        const pricePerPage = window.elementSdk?.config?.price_per_page || defaultConfig.price_per_page;
+        const totalAmount = numPages * pricePerPage;
+
+        const paymentMethod = document.querySelector('input[name="payment-method"]:checked')?.value || '';
+
+        const orderData = {
+          name: document.getElementById('name').value,
+          email: document.getElementById('email').value,
+          phone: document.getElementById('phone').value,
+          service_type: document.getElementById('service-type').value,
+          subject: document.getElementById('subject').value,
+          deadline: document.getElementById('deadline').value,
+          details: document.getElementById('details').value,
+          num_pages: numPages,
+          total_amount: totalAmount,
+          payment_method: paymentMethod,
+          status: 'pending',
+          submitted_at: new Date().toISOString()
+        };
+
+        if (window.dataSdk) {
+          const result = await window.dataSdk.create(orderData);
+
+          if (result.isOk) {
+            form.reset();
+            successMsg.style.display = 'block';
+            errorMsg.style.display = 'none';
+            setTimeout(() => {
+              successMsg.style.display = 'none';
+            }, 5000);
+          } else {
+            errorMsg.textContent = 'Failed to submit request. Please try again.';
+            errorMsg.style.display = 'block';
+            setTimeout(() => {
+              errorMsg.style.display = 'none';
+            }, 5000);
+          }
+        }
+
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = '1';
+        submitText.textContent = window.elementSdk?.config?.submit_button_text || defaultConfig.submit_button_text;
+      });
+    }
+
+    function renderOrders() {
+      const ordersList = document.getElementById('orders-list');
+      if (!ordersList) return;
+
+      if (orders.length === 0) {
+        ordersList.innerHTML = `<p style="text-align: center; color: ${window.elementSdk?.config?.text_color || defaultConfig.text_color}; opacity: 0.6; font-size: ${(window.elementSdk?.config?.font_size || defaultConfig.font_size) * 0.875}px;">No requests yet</p>`;
+        return;
+      }
+
+      const sortedOrders = [...orders].sort((a, b) => 
+        new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime()
+      );
+
+      const paymentMethodIcons = {
+        'upi': '💳',
+        'paytm': '📱',
+        'gpay': '🔷',
+        'phonepe': '💜',
+        'card': '💳',
+        'cod': '💵'
+      };
+
+      ordersList.innerHTML = sortedOrders.map(order => {
+        const date = new Date(order.submitted_at);
+        const formattedDate = date.toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'short', 
+          day: 'numeric' 
+        });
+
+        const paymentIcon = paymentMethodIcons[order.payment_method] || '💳';
+        const paymentName = order.payment_method ? order.payment_method.toUpperCase() : 'Not specified';
+
+        return `
+          <div style="background: ${window.elementSdk?.config?.secondary_color || defaultConfig.secondary_color}; padding: 1.25rem; border-radius: 0.5rem; margin-bottom: 1rem; box-shadow: 0 2px 6px rgba(0,0,0,0.08); border-left: 4px solid ${window.elementSdk?.config?.primary_color || defaultConfig.primary_color};">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+              <div>
+                <h3 style="font-size: ${(window.elementSdk?.config?.font_size || defaultConfig.font_size) * 1.125}px; font-weight: 600; margin: 0 0 0.25rem 0; color: ${window.elementSdk?.config?.text_color || defaultConfig.text_color};">${order.name}</h3>
+                <p style="font-size: ${(window.elementSdk?.config?.font_size || defaultConfig.font_size) * 0.875}px; color: ${window.elementSdk?.config?.text_color || defaultConfig.text_color}; opacity: 0.7; margin: 0;">${order.service_type.charAt(0).toUpperCase() + order.service_type.slice(1).replace('-', ' ')} • ${order.subject}</p>
+              </div>
+              <span style="font-size: ${(window.elementSdk?.config?.font_size || defaultConfig.font_size) * 0.75}px; color: ${window.elementSdk?.config?.text_color || defaultConfig.text_color}; opacity: 0.6;">${formattedDate}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <p style="font-size: ${(window.elementSdk?.config?.font_size || defaultConfig.font_size) * 0.875}px; color: ${window.elementSdk?.config?.text_color || defaultConfig.text_color}; opacity: 0.8; margin: 0;">Pages: ${order.num_pages} | Deadline: ${new Date(order.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 0.75rem; border-top: 1px solid #e2e8f0;">
+              <div>
+                <span style="font-size: ${(window.elementSdk?.config?.font_size || defaultConfig.font_size) * 0.875}px; font-weight: 500; color: ${window.elementSdk?.config?.text_color || defaultConfig.text_color};">Payment: ${paymentIcon} ${paymentName}</span>
+              </div>
+              <span style="font-size: ${(window.elementSdk?.config?.font_size || defaultConfig.font_size) * 1.125}px; font-weight: 700; color: ${window.elementSdk?.config?.primary_color || defaultConfig.primary_color};">₹${order.total_amount}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function onConfigChange(config) {
+      const businessName = document.getElementById('business-name');
+      const tagline = document.getElementById('tagline');
+      const servicesTitle = document.getElementById('services-title');
+      const contactTitle = document.getElementById('contact-title');
+      const submitText = document.getElementById('submit-text');
+
+      if (businessName) {
+        businessName.textContent = config.business_name || defaultConfig.business_name;
+        businessName.style.fontSize = `${(config.font_size || defaultConfig.font_size) * 2}px`;
+        businessName.style.fontFamily = `${config.font_family || defaultConfig.font_family}, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`;
+      }
+
+      if (tagline) {
+        tagline.textContent = config.tagline || defaultConfig.tagline;
+        tagline.style.fontSize = `${(config.font_size || defaultConfig.font_size) * 1.125}px`;
+        tagline.style.fontFamily = `${config.font_family || defaultConfig.font_family}, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`;
+      }
+
+      if (servicesTitle) {
+        servicesTitle.textContent = config.services_title || defaultConfig.services_title;
+        servicesTitle.style.fontSize = `${(config.font_size || defaultConfig.font_size) * 1.75}px`;
+        servicesTitle.style.fontFamily = `${config.font_family || defaultConfig.font_family}, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`;
+        servicesTitle.style.color = config.text_color || defaultConfig.text_color;
+      }
+
+      if (contactTitle) {
+        contactTitle.textContent = config.contact_title || defaultConfig.contact_title;
+        contactTitle.style.fontSize = `${(config.font_size || defaultConfig.font_size) * 1.5}px`;
+        contactTitle.style.fontFamily = `${config.font_family || defaultConfig.font_family}, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`;
+        contactTitle.style.color = config.text_color || defaultConfig.text_color;
+      }
+
+      if (submitText) {
+        submitText.textContent = config.submit_button_text || defaultConfig.submit_button_text;
+      }
+
+      const totalAmountDisplay = document.getElementById('total-amount');
+      if (totalAmountDisplay) {
+        totalAmountDisplay.style.color = config.primary_color || defaultConfig.primary_color;
+        totalAmountDisplay.style.fontSize = `${(config.font_size || defaultConfig.font_size) * 1.5}px`;
+        const numPagesInput = document.getElementById('num-pages');
+        if (numPagesInput) {
+          const pages = parseInt(numPagesInput.value) || 1;
+          const pricePerPage = config.price_per_page || defaultConfig.price_per_page;
+          totalAmountDisplay.textContent = `₹${pages * pricePerPage}`;
+        }
+      }
+
+      const header = document.querySelector('header');
+      if (header) {
+        header.style.background = config.primary_color || defaultConfig.primary_color;
+      }
+
+      const appContainer = document.querySelector('#app > div');
+      if (appContainer) {
+        appContainer.style.background = config.background_color || defaultConfig.background_color;
+        appContainer.style.fontFamily = `${config.font_family || defaultConfig.font_family}, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`;
+      }
+
+      const submitBtn = document.getElementById('submit-btn');
+      if (submitBtn) {
+        submitBtn.style.background = config.primary_color || defaultConfig.primary_color;
+        submitBtn.style.fontSize = `${(config.font_size || defaultConfig.font_size) * 1.125}px`;
+        submitBtn.style.fontFamily = `${config.font_family || defaultConfig.font_family}, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`;
+      }
+
+      renderOrders();
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [
+          {
+            get: () => config.background_color || defaultConfig.background_color,
+            set: (value) => {
+              config.background_color = value;
+              window.elementSdk.setConfig({ background_color: value });
+            }
+          },
+          {
+            get: () => config.primary_color || defaultConfig.primary_color,
+            set: (value) => {
+              config.primary_color = value;
+              window.elementSdk.setConfig({ primary_color: value });
+            }
+          },
+          {
+            get: () => config.secondary_color || defaultConfig.secondary_color,
+            set: (value) => {
+              config.secondary_color = value;
+              window.elementSdk.setConfig({ secondary_color: value });
+            }
+          },
+          {
+            get: () => config.text_color || defaultConfig.text_color,
+            set: (value) => {
+              config.text_color = value;
+              window.elementSdk.setConfig({ text_color: value });
+            }
+          },
+          {
+            get: () => config.accent_color || defaultConfig.accent_color,
+            set: (value) => {
+              config.accent_color = value;
+              window.elementSdk.setConfig({ accent_color: value });
+            }
+          }
+        ],
+        borderables: [],
+        fontEditable: {
+          get: () => config.font_family || defaultConfig.font_family,
+          set: (value) => {
+            config.font_family = value;
+            window.elementSdk.setConfig({ font_family: value });
+          }
+        },
+        fontSizeable: {
+          get: () => config.font_size || defaultConfig.font_size,
+          set: (value) => {
+            config.font_size = value;
+            window.elementSdk.setConfig({ font_size: value });
+          }
+        }
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ["business_name", config.business_name || defaultConfig.business_name],
+        ["tagline", config.tagline || defaultConfig.tagline],
+        ["services_title", config.services_title || defaultConfig.services_title],
+        ["contact_title", config.contact_title || defaultConfig.contact_title],
+        ["submit_button_text", config.submit_button_text || defaultConfig.submit_button_text]
+      ]);
+    }
+
+    document.addEventListener('DOMContentLoaded', initializeApp);
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a2110ce91e44212',t:'MTc2MzczNzMyMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
